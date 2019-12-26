@@ -6,14 +6,16 @@
 
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Triangle");
-    // window.setFramerateLimit(120);
+    sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Diffiusion limited aggregation");
     std::srand(time(NULL));
     
+    //initiated values
     float radius = 4.f;
     std::vector<sf::Vector2u> tree;
     sf::CircleShape leaf(radius, 16);
     leaf.setFillColor(sf::Color::White);
+
+    sf::Uint8* pixels = new sf::Uint8[SCREEN_WIDTH * SCREEN_HEIGHT * 4];
 
     sf::VertexArray points(sf::Points, SCREEN_WIDTH * SCREEN_HEIGHT);
     for(int i = 0; i < SCREEN_WIDTH; i++) {
@@ -27,8 +29,9 @@ int main() {
     //starting seed
     tree.push_back(initialPosition);
     
-    Particle particles[100];
-    for(int i = 0; i < 100; i++) {
+    int particleCount = 100;
+    Particle particles[particleCount];
+    for(int i = 0; i < particleCount; i++) {
         particles[i].Reset(rand() % SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, rand() % SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 4);
     }
     
@@ -43,7 +46,7 @@ int main() {
                 window.close();
         }
         if(tree.size() < 50000) {
-            for(int j = 0; j < 100; j++) {
+            for(int j = 0; j < particleCount; j++) {
                 particlePosition = particles[j].Move();
                 std::size_t treeSize = tree.size();
                 for(std::size_t i = 0; i < treeSize; i++) {
