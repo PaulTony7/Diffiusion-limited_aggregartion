@@ -4,9 +4,14 @@
 #include <stdlib.h>
 #include <iostream>
 #include <cmath>
+#define TWO_PI 6.28318530718
 
-
-
+void particleReset(Particle& particle, const int& ring_width, const int& ring) {
+    float angle = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/TWO_PI));
+    float radius = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/ring_width)) + ring;
+    particle.Reset(sin(angle) * radius + SCREEN_WIDTH / 2, cos(angle) * radius + SCREEN_HEIGHT / 2); 
+    // std::cout << sin(angle) << "  " << cos(angle) << std::endl;
+}
 int main() {
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Diffiusion limited aggregation");
     std::srand(time(NULL));
@@ -58,7 +63,7 @@ int main() {
     int particleCount = 200;
     Particle particles[particleCount];
     for(int i = 0; i < particleCount; i++) {
-        particles[i].Reset(rand() % SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, rand() % SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 4);
+        particleReset(particles[i], ring_width, ring);  
     }
     
     sf::Vector2u particlePosition;
@@ -76,16 +81,9 @@ int main() {
                 particlePosition = particles[j].Move();
                 uint x = particlePosition.x;
                 uint y = particlePosition.y;
-                // std::cout << "hit" << x << y << std::endl;
                 if(x < 1 || x >= SCREEN_WIDTH-1 || y < 1 || y >= SCREEN_HEIGHT-1) {
-                    do {
-                        // particles[j].Reset(rand() % (ring_out * 2) - ring_out, rand() % (ring_out * 2) - ring_out);
-                        particles[j].Reset(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);           
+                    particleReset(particles[j], ring_width, ring);
 
-                    }while (ring < (int) (particles[j].position.x - SCREEN_WIDTH / 2 ) && 
-                            (int) (particles[j].position.x - SCREEN_WIDTH / 2) < ring_out && 
-                            ring < (int) (particles[j].position.y - SCREEN_HEIGHT / 2) && 
-                            (int)(particles[j].position.y - SCREEN_HEIGHT / 2) < ring_out);
                     continue;
                 }
                 if(tree_filled[x-1][y-1] || tree_filled[x][y-1] || tree_filled[x+1][y-1] ||
@@ -99,7 +97,6 @@ int main() {
                     pixels[(y * SCREEN_WIDTH + x) * 4] = 255;
                     pixels[(y * SCREEN_WIDTH + x) * 4 + 1] = 255;
                     pixels[(y * SCREEN_WIDTH + x) * 4 + 2] = 255;
-                    std::cout << "hit" << x << y << std::endl;
                     tree_filled[x][y] = true;
 
                     if(distFromMiddle > ring) {
@@ -112,15 +109,7 @@ int main() {
                         circle2.setRadius(ring_out);
                         circle2.setPosition(SCREEN_WIDTH / 2 - ring_out, SCREEN_HEIGHT / 2 - ring_out);
                     }
-                    do {
-                        // particles[j].Reset(rand() % (ring_out * 2) - ring_out, rand() % (ring_out * 2) - ring_out);
-                        particles[j].Reset(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);           
-
-                    }while (ring < (int) (particles[j].position.x - SCREEN_WIDTH / 2 ) && 
-                            (int) (particles[j].position.x - SCREEN_WIDTH / 2) < ring_out && 
-                            ring < (int) (particles[j].position.y - SCREEN_HEIGHT / 2) && 
-                            (int)(particles[j].position.y - SCREEN_HEIGHT / 2) < ring_out);
-                    
+                    particleReset(particles[j], ring_width, ring);
                 }
             }
         }
